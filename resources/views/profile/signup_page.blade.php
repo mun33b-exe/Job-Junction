@@ -160,7 +160,13 @@
                 </form>
 
                 <div class="signup-footer">
-                    <p>Already have an account? <a href="#" class="link">Sign In</a></p>
+                    <form action="{{route('login.view')}}" method="post">
+                    @csrf
+                        <p>Already have an account? 
+                            <input type="submit" class="link" value="Sign In"/>
+                        </p>
+                    </form>
+                    
                 </div>
 
                 <div class="social-signup">
