@@ -62,13 +62,38 @@
 
         <!-- Right Side - Login Form -->
         <div class="signup-form-container">
-            <div class="signup-form-content">
-                <div class="form-header">
+            <div class="signup-form-content">                <div class="form-header">
                     <h2>Sign In</h2>
                     <p>Enter your credentials to access your account</p>
                 </div>
 
-                <form class="signup-form" action="#" method="POST">
+                <!-- Display Success/Error Messages -->
+                @if(session('success'))
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <ul>
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form class="signup-form" action="{{route('auth.user')}}" method="POST">
                     @csrf
                     <div class="form-group">
                         <label for="email">
@@ -106,13 +131,11 @@
                         <span>Sign In</span>
                         <i class="fas fa-arrow-right"></i>
                     </button>
-                </form>
-
-                <div class="signup-footer">
+                </form>                <div class="signup-footer">
                     <form action="{{route('signup.view')}}" method="post">
                     @csrf
                         <p>Don't have an account? 
-                            <input type="submit" class="link" value="Sign In"/>
+                            <input type="submit" class="link" value="Sign Up"/>
                         </p>
                     </form>
                 </div>
@@ -192,23 +215,17 @@
         document.querySelector('.employer-access').addEventListener('click', function() {
             // Add employer-specific login logic here
             console.log('Employer portal access');
-        });
-
-        // Enhanced form submission
+        });        // Enhanced form submission
         document.querySelector('.signup-form').addEventListener('submit', function(e) {
-            e.preventDefault();
             const submitBtn = document.querySelector('.btn-signup');
             
             // Add loading state
             submitBtn.classList.add('loading');
             submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
             
-            // Simulate form submission (replace with actual login logic)
-            setTimeout(() => {
-                submitBtn.classList.remove('loading');
-                submitBtn.disabled = false;
-                // Handle successful login or show error
-            }, 2000);
+            // Allow form to submit normally - remove preventDefault
+            // The form will submit to the server
         });
     </script>
 </body>

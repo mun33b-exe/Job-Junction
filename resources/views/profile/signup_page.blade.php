@@ -67,7 +67,7 @@
                     <p>Fill in your details to get started</p>
                 </div>
 
-                <form class="signup-form" action="#" method="POST">
+                <form class="signup-form" action="{{route('create.user')}}" method="POST">
                     @csrf
                     <div class="form-group">
                         <label for="fullname">
