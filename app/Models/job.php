@@ -23,4 +23,8 @@ class job extends Model
     {
         return $this->belongsTo(Profile::class);
     }
+    public function jobActions()
+    {
+        return $this->hasMany(job_action::class);
+    }
 }

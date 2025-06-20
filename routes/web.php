@@ -34,6 +34,9 @@ Route::get('/user/logout', [ProfileController::class, 'logout'])->name('logout')
 Route::post('/dashboard/job/create', [ProfileController::class, 'store_job'])->name('create.job');
 Route::get('/dashboard/job/create', [ProfileController::class, 'store_job'])->name('create.job');
 
+Route::post('/actions/employee', [ProfileController::class, 'job_action'])->name('job.action');
+Route::get('/actions/employee', [ProfileController::class, 'job_action'])->name('job.action');
+
 
 
 

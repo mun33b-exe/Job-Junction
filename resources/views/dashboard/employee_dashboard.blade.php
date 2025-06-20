@@ -144,19 +144,17 @@
 
                 <!-- Job Feed -->
                 <div class="job-feed">
-                    <!-- Job Post 1 -->
+                    @forelse($all_jobs as $job)
+                    <!-- Job Post -->
                     <article class="job-post">
                         <div class="job-header">
-                            <div class="company-logo">
-                                <img src="https://via.placeholder.com/60x60/4F959D/FFFFFF?text=TI" alt="TechInnovate">
-                            </div>
+                            
                             <div class="job-meta">
-                                <h3 class="job-title">Senior Software Developer</h3>
-                                <p class="company-name">TechInnovate Solutions</p>
+                                <h3 class="job-title">{{ $job->job_title }}</h3>
                                 <div class="job-details">
-                                    <span class="location"><i class="fas fa-map-marker-alt"></i> Karachi, Pakistan</span>
-                                    <span class="job-type">Full-time</span>
-                                    <span class="posted-time">2 hours ago</span>
+                                    <span class="location"><i class="fas fa-map-marker-alt"></i> {{ $job->location }}</span>
+                                    <span class="job-type">{{ $job->job_type }}</span>
+                                    <span class="posted-time">{{ $job->created_at->diffForHumans() }}</span>
                                 </div>
                             </div>
                             <div class="job-actions">
@@ -170,209 +168,68 @@
                         </div>
 
                         <div class="job-content">
-                            <div class="job-image">
-                                <img src="https://via.placeholder.com/600x300/98D2C0/FFFFFF?text=Join+Our+Tech+Team" alt="Job Image">
-                            </div>
+                        
+                            
                             <div class="job-description">
-                                <p>We're looking for a passionate Senior Software Developer to join our growing team. You'll work on cutting-edge projects using modern technologies and collaborate with talented professionals.</p>
+                                <h4>Job Description:</h4>
+                                <p>{{ $job->job_description }}</p>
                             </div>
+                            
+                            @if($job->requirements)
+                            <div class="job-requirements">
+                                <h4>Requirements:</h4>
+                                <p>{{ $job->requirements }}</p>
+                            </div>
+                            @endif
+                            
                             <div class="job-tags">
-                                <span class="tag">React</span>
-                                <span class="tag">Node.js</span>
-                                <span class="tag">Python</span>
-                                <span class="tag">AWS</span>
+                                <span class="tag">{{ $job->job_type }}</span>
+                                <span class="tag">{{ $job->experience_level }}</span>
                             </div>
+                            
                             <div class="salary-range">
                                 <i class="fas fa-money-bill-wave"></i>
-                                <span>PKR 80,000 - 120,000 per month</span>
+                                <span>{{ $job->salary_range }}</span>
                             </div>
+                            
+                            @if($job->application_deadline)
+                            <div class="application-deadline">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Apply by: {{ \Carbon\Carbon::parse($job->application_deadline)->format('M d, Y') }}</span>
+                            </div>
+                            @endif
                         </div>
 
                         <div class="job-footer">
                             <div class="engagement-stats">
-                                <span><i class="fas fa-eye"></i> 234 views</span>
-                                <span><i class="fas fa-users"></i> 12 applicants</span>
+                                <span><i class="fas fa-eye"></i> 0 views</span>
+                                <span><i class="fas fa-users"></i> 0 applicants</span>
                             </div>
+                            
                             <div class="action-buttons">
+                                <form action="{{route('job.action')}}" method="post">
+                                @csrf
+                                <input type="text" name="profile_id" value="{{ $data->id }}" hidden>
+                                <input type="text" name="job_id" value="{{ $job->id }}" hidden>
                                 <button class="btn-secondary">Learn More</button>
-                                <button class="btn-primary">
+                                <button class="btn-primary" type="submit">
                                     <i class="fas fa-paper-plane"></i>
                                     Apply Now
                                 </button>
+                                </form>
                             </div>
                         </div>
                     </article>
-
-                    <!-- Job Post 2 -->
-                    <article class="job-post">
-                        <div class="job-header">
-                            <div class="company-logo">
-                                <img src="https://via.placeholder.com/60x60/205781/FFFFFF?text=DM" alt="Digital Marketing Pro">
-                            </div>
-                            <div class="job-meta">
-                                <h3 class="job-title">Digital Marketing Manager</h3>
-                                <p class="company-name">Digital Marketing Pro</p>
-                                <div class="job-details">
-                                    <span class="location"><i class="fas fa-map-marker-alt"></i> Lahore, Pakistan</span>
-                                    <span class="job-type">Full-time</span>
-                                    <span class="posted-time">5 hours ago</span>
-                                </div>
-                            </div>
-                            <div class="job-actions">
-                                <button class="action-btn save-btn" title="Save Job">
-                                    <i class="fas fa-bookmark"></i>
-                                </button>
-                                <button class="action-btn more-btn" title="More Options">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </button>
-                            </div>
+                    @empty
+                    <!-- No Jobs Found -->
+                    <div class="no-jobs-found">
+                        <div class="empty-state">
+                            <i class="fas fa-briefcase"></i>
+                            <h3>No Jobs Available</h3>
+                            <p>There are currently no job postings available. Please check back later.</p>
                         </div>
-
-                        <div class="job-content">
-                            <div class="job-description">
-                                <p>Join our dynamic marketing team and lead digital campaigns that drive growth. Perfect opportunity for creative minds who love data-driven marketing strategies.</p>
-                            </div>
-                            <div class="job-tags">
-                                <span class="tag">Digital Marketing</span>
-                                <span class="tag">SEO</span>
-                                <span class="tag">Social Media</span>
-                                <span class="tag">Analytics</span>
-                            </div>
-                            <div class="salary-range">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <span>PKR 60,000 - 90,000 per month</span>
-                            </div>
-                        </div>
-
-                        <div class="job-footer">
-                            <div class="engagement-stats">
-                                <span><i class="fas fa-eye"></i> 156 views</span>
-                                <span><i class="fas fa-users"></i> 8 applicants</span>
-                            </div>
-                            <div class="action-buttons">
-                                <button class="btn-secondary">Learn More</button>
-                                <button class="btn-primary">
-                                    <i class="fas fa-paper-plane"></i>
-                                    Apply Now
-                                </button>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Job Post 3 -->
-                    <article class="job-post">
-                        <div class="job-header">
-                            <div class="company-logo">
-                                <img src="https://via.placeholder.com/60x60/F6F8D5/205781?text=UI" alt="UI Design Studio">
-                            </div>
-                            <div class="job-meta">
-                                <h3 class="job-title">UI/UX Designer</h3>
-                                <p class="company-name">Creative Design Studio</p>
-                                <div class="job-details">
-                                    <span class="location"><i class="fas fa-map-marker-alt"></i> Remote</span>
-                                    <span class="job-type">Part-time</span>
-                                    <span class="posted-time">1 day ago</span>
-                                </div>
-                            </div>
-                            <div class="job-actions">
-                                <button class="action-btn save-btn saved" title="Save Job">
-                                    <i class="fas fa-bookmark"></i>
-                                </button>
-                                <button class="action-btn more-btn" title="More Options">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="job-content">
-                            <div class="job-image">
-                                <img src="https://via.placeholder.com/600x300/205781/FFFFFF?text=Design+Amazing+Experiences" alt="Design Job">
-                            </div>
-                            <div class="job-description">
-                                <p>Create beautiful and intuitive user interfaces for web and mobile applications. Work with a creative team on exciting projects for international clients.</p>
-                            </div>
-                            <div class="job-tags">
-                                <span class="tag">Figma</span>
-                                <span class="tag">Adobe XD</span>
-                                <span class="tag">Prototyping</span>
-                                <span class="tag">User Research</span>
-                            </div>
-                            <div class="salary-range">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <span>PKR 40,000 - 60,000 per month</span>
-                            </div>
-                        </div>
-
-                        <div class="job-footer">
-                            <div class="engagement-stats">
-                                <span><i class="fas fa-eye"></i> 89 views</span>
-                                <span><i class="fas fa-users"></i> 5 applicants</span>
-                            </div>
-                            <div class="action-buttons">
-                                <button class="btn-secondary">Learn More</button>
-                                <button class="btn-primary">
-                                    <i class="fas fa-paper-plane"></i>
-                                    Apply Now
-                                </button>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- Job Post 4 -->
-                    <article class="job-post">
-                        <div class="job-header">
-                            <div class="company-logo">
-                                <img src="https://via.placeholder.com/60x60/98D2C0/FFFFFF?text=DA" alt="Data Analytics Corp">
-                            </div>
-                            <div class="job-meta">
-                                <h3 class="job-title">Data Analyst Internship</h3>
-                                <p class="company-name">Data Analytics Corp</p>
-                                <div class="job-details">
-                                    <span class="location"><i class="fas fa-map-marker-alt"></i> Islamabad, Pakistan</span>
-                                    <span class="job-type">Internship</span>
-                                    <span class="posted-time">2 days ago</span>
-                                </div>
-                            </div>
-                            <div class="job-actions">
-                                <button class="action-btn save-btn" title="Save Job">
-                                    <i class="fas fa-bookmark"></i>
-                                </button>
-                                <button class="action-btn more-btn" title="More Options">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="job-content">
-                            <div class="job-description">
-                                <p>Perfect opportunity for students to gain hands-on experience in data analysis. Work with real datasets and learn from industry experts.</p>
-                            </div>
-                            <div class="job-tags">
-                                <span class="tag">Python</span>
-                                <span class="tag">SQL</span>
-                                <span class="tag">Excel</span>
-                                <span class="tag">Data Visualization</span>
-                            </div>
-                            <div class="salary-range">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <span>PKR 25,000 - 35,000 per month</span>
-                            </div>
-                        </div>
-
-                        <div class="job-footer">
-                            <div class="engagement-stats">
-                                <span><i class="fas fa-eye"></i> 167 views</span>
-                                <span><i class="fas fa-users"></i> 23 applicants</span>
-                            </div>
-                            <div class="action-buttons">
-                                <button class="btn-secondary">Learn More</button>
-                                <button class="btn-primary">
-                                    <i class="fas fa-paper-plane"></i>
-                                    Apply Now
-                                </button>
-                            </div>
-                        </div>
-                    </article>
+                    </div>
+                    @endforelse
                 </div>
 
                 <!-- Load More Button -->

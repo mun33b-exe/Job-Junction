@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\profile;
 use App\Models\job;
+use App\Models\job_action;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -76,6 +77,9 @@ class ProfileController extends Controller
     public function auth(Request $request)
     {
         $data = profile::where('email', $request->email)->first();
+        $all_jobs= job::all();
+        $employer_jobs = job::where('employer_id', $data->id)->get();
+
         
         if ($data) {
             if(Hash::check($request->password, $data->password)) {
@@ -83,9 +87,9 @@ class ProfileController extends Controller
                 session(['stored_data' => $data]);
                 
                 if ($data->role == 'employee') {
-                    return view('dashboard.employee_dashboard', compact('data'))->with('success', 'Login successful as Employee!');
+                    return view('dashboard.employee_dashboard', compact('data', 'all_jobs'))->with('success', 'Login successful as Employee!');
                 } elseif ($data->role == 'employer') {
-                    return view('dashboard.employeer_dashboard', compact('data'))->with('success', 'Login successful as Employer!');
+                    return view('dashboard.employeer_dashboard', compact('data', 'employer_jobs'))->with('success', 'Login successful as Employer!');
                 } else {
                     return redirect()->back()->with('error', 'Access Denied! Invalid role.');
                 }
@@ -136,6 +140,32 @@ class ProfileController extends Controller
             $data->job_image = null;
         }
         $data->save();
-        return view('dashboard.employeer_dashboard', ['data' => $stored_data])->with('success', 'Job created successfully!');
+        
+        // Get updated employer jobs after creating new job
+        $employer_jobs = job::where('employer_id', $stored_data->id)->get();
+        return view('dashboard.employeer_dashboard', ['data' => $stored_data, 'employer_jobs' => $employer_jobs])->with('success', 'Job created successfully!');
     }
+
+
+
+    public function job_action(Request $request)
+    {
+        if (!session()->has('stored_data')) {
+            return redirect()->route('login.view')->with('error', 'Session expired. Please login again.');
+        }
+
+        $stored_data = session('stored_data');
+        
+        $data = new job_action();
+        $data->job_id = $request->job_id;
+        $data->employee_id = $stored_data->id;
+        $data->save();
+
+        // Get all jobs again to refresh the view
+        $all_jobs = job::all();
+        return view('dashboard.employee_dashboard', compact('stored_data', 'all_jobs'))->with('success', 'Job application submitted successfully!');
+    }
+
+
+
 }

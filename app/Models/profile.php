@@ -14,4 +14,14 @@ class profile extends Model
         'role',
     ];
 
+    public function jobs()
+    {
+        return $this->hasMany(job::class);
+    }
+    public function jobActions()
+    {
+        return $this->hasMany(job_action::class);
+    }
+    
+
 }
