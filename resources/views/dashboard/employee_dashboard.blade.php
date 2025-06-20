@@ -42,7 +42,7 @@
                         <div class="profile-dropdown">
                             <a href="#"><i class="fas fa-user-circle"></i> View Profile</a>
                             <a href="#"><i class="fas fa-cog"></i> Settings</a>
-                            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                            <a href="{{route('logout')}}"><i class="fas fa-sign-out-alt"></i> Logout</a>
                         </div>
                     </div>
                 </div>

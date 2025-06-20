@@ -25,7 +25,16 @@ Route::get('signup/view', [ProfileController::class, 'signup_view'])->name('sign
 
 Route::post('/user/store', [ProfileController::class, 'store'])->name('create.user');
 Route::post('/user/auth', [ProfileController::class, 'auth'])->name('auth.user');
+Route::get('/user/auth', [ProfileController::class, 'auth'])->name('auth.user');
 Route::get('/user/logout', [ProfileController::class, 'logout'])->name('logout');
+
+
+
+//dashboard routes
+Route::post('/dashboard/job/create', [ProfileController::class, 'store_job'])->name('create.job');
+Route::get('/dashboard/job/create', [ProfileController::class, 'store_job'])->name('create.job');
+
+
 
 
 //temporary dashboard routes

@@ -176,7 +176,8 @@
                     <p>Fill in the details to create a new job posting</p>
                 </div>
 
-                <form class="job-form">
+                <form class="job-form" action="{{ route('create.job') }}" method="POST" >
+                    @csrf
                     <div class="form-row">
                         <div class="form-group">
                             <label for="job-title">
