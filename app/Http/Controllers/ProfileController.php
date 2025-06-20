@@ -77,9 +77,6 @@ class ProfileController extends Controller
     public function auth(Request $request)
     {
         $data = profile::where('email', $request->email)->first();
-        $all_jobs= job::all();
-        $employer_jobs = job::where('employer_id', $data->id)->get();
-
         
         if ($data) {
             if(Hash::check($request->password, $data->password)) {
@@ -87,8 +84,15 @@ class ProfileController extends Controller
                 session(['stored_data' => $data]);
                 
                 if ($data->role == 'employee') {
-                    return view('dashboard.employee_dashboard', compact('data', 'all_jobs'))->with('success', 'Login successful as Employee!');
+                    $all_jobs = job::all();
+                    $applied_jobs_count = job_action::where('profile_id', $data->id)->count();
+                    $applied_jobs = job_action::where('profile_id', $data->id)
+                                              ->with('job')
+                                              ->orderBy('created_at', 'desc')
+                                              ->get();
+                    return view('dashboard.employee_dashboard', compact('data', 'all_jobs', 'applied_jobs_count', 'applied_jobs'))->with('success', 'Login successful as Employee!');
                 } elseif ($data->role == 'employer') {
+                    $employer_jobs = job::where('employer_id', $data->id)->get();
                     return view('dashboard.employeer_dashboard', compact('data', 'employer_jobs'))->with('success', 'Login successful as Employer!');
                 } else {
                     return redirect()->back()->with('error', 'Access Denied! Invalid role.');
@@ -156,14 +160,58 @@ class ProfileController extends Controller
 
         $stored_data = session('stored_data');
         
-        $data = new job_action();
-        $data->job_id = $request->job_id;
-        $data->employee_id = $stored_data->id;
-        $data->save();
+        $existing_application = job_action::where('job_id', $request->job_id)
+                                         ->where('profile_id', $stored_data->id)
+                                         ->first();
+        
+        if ($existing_application) {
+            $all_jobs = job::all();
+            $applied_jobs_count = job_action::where('profile_id', $stored_data->id)->count();
+            $applied_jobs = job_action::where('profile_id', $stored_data->id)
+                                      ->with('job')
+                                      ->orderBy('created_at', 'desc')
+                                      ->get();
+            return view('dashboard.employee_dashboard', ['data' => $stored_data, 'all_jobs' => $all_jobs, 'applied_jobs_count' => $applied_jobs_count, 'applied_jobs' => $applied_jobs])
+                   ->with('error', 'You have already applied for this job!');
+        }
+        
+        $application = new job_action();
+        $application->job_id = $request->job_id;
+        $application->profile_id = $stored_data->id;
+        $application->save();
 
-        // Get all jobs again to refresh the view
         $all_jobs = job::all();
-        return view('dashboard.employee_dashboard', compact('stored_data', 'all_jobs'))->with('success', 'Job application submitted successfully!');
+        $applied_jobs_count = job_action::where('profile_id', $stored_data->id)->count();
+        $applied_jobs = job_action::where('profile_id', $stored_data->id)
+                                  ->with('job')
+                                  ->orderBy('created_at', 'desc')
+                                  ->get();
+        return view('dashboard.employee_dashboard', ['data' => $stored_data, 'all_jobs' => $all_jobs, 'applied_jobs_count' => $applied_jobs_count, 'applied_jobs' => $applied_jobs])
+               ->with('success', 'Job application submitted successfully!');
+    }
+
+
+
+    public function saved(Request $request)
+    {
+        if (!session()->has('stored_data')) {
+            return redirect()->route('login.view')->with('error', 'Session expired. Please login again.');
+        }
+
+        $stored_data = session('stored_data');
+        
+        $saved_jobs= new job_action();
+        $saved_jobs->job_id = $request->job_id;
+        $saved_jobs->profile_id = $stored_data->id;
+        $saved_jobs->save();
+
+        $saved_posts= job_action::where('profile_id', $stored_data->id)
+                                      ->with('job')
+                                      ->orderBy('created_at', 'desc')
+                                      ->get();
+
+        return view('dashboard.employee_dashboard', ['data' => $stored_data, 'all_jobs' => $all_jobs, 'applied_jobs_count' => $applied_jobs_count, 'applied_jobs' => $applied_jobs, 'saved_posts' => $saved_posts])
+               ->with('success', 'Job application saved successfully!');
     }
 
 

@@ -74,7 +74,7 @@
                         <a href="#my-applications">
                             <i class="fas fa-file-alt"></i>
                             <span>My Applications</span>
-                            <span class="nav-badge">12</span>
+                            <span class="nav-badge">{{ $applied_jobs_count ?? 0 }}</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -103,27 +103,28 @@
                         </a>
                     </li>
                 </ul>
-            </nav>
-
-            <div class="quick-stats">
+            </nav>            <div class="quick-stats">
                 <h4>Quick Stats</h4>
                 <div class="stat-item">
-                    <span class="stat-number">12</span>
+                    <span class="stat-number">{{ $applied_jobs_count ?? 0 }}</span>
                     <span class="stat-label">Applications</span>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-number">3</span>
-                    <span class="stat-label">Interviews</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">47</span>
-                    <span class="stat-label">Profile Views</span>
-                </div>
             </div>
-        </aside>
-
-        <!-- Main Content -->
+        </aside>        <!-- Main Content -->
         <main class="dashboard-main">
+            <!-- Success/Error Messages -->
+            @if(session('success'))
+                <div class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
+                </div>
+            @endif
+            
+            @if(session('error'))
+                <div class="alert alert-error" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+                    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+                </div>
+            @endif
+            
             <!-- Job Feed Section -->
             <section id="job-feed" class="dashboard-section active">
                 <div class="section-header">
@@ -204,18 +205,16 @@
                             <div class="engagement-stats">
                                 <span><i class="fas fa-eye"></i> 0 views</span>
                                 <span><i class="fas fa-users"></i> 0 applicants</span>
-                            </div>
-                            
-                            <div class="action-buttons">
-                                <form action="{{route('job.action')}}" method="post">
-                                @csrf
-                                <input type="text" name="profile_id" value="{{ $data->id }}" hidden>
-                                <input type="text" name="job_id" value="{{ $job->id }}" hidden>
-                                <button class="btn-secondary">Learn More</button>
-                                <button class="btn-primary" type="submit">
-                                    <i class="fas fa-paper-plane"></i>
-                                    Apply Now
-                                </button>
+                            </div>                            <div class="action-buttons">
+                                <button class="btn-secondary" onclick="alert('Learn More functionality to be implemented')">Learn More</button>
+                                <form action="{{route('job.action')}}" method="post" style="display: inline;">
+                                    @csrf
+                                    <input type="hidden" name="profile_id" value="{{ $data->id }}">
+                                    <input type="hidden" name="job_id" value="{{ $job->id }}">
+                                    <button class="btn-primary" type="submit">
+                                        <i class="fas fa-paper-plane"></i>
+                                        Apply Now
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -246,52 +245,31 @@
                 <div class="section-header">
                     <h1>My Applications</h1>
                     <p>Track the status of your job applications</p>
-                </div>
-
-                <div class="applications-list">
+                </div>                <div class="applications-list">
+                    @forelse($applied_jobs as $application)
                     <div class="application-item">
                         <div class="application-header">
-                            <div class="company-logo">
-                                <img src="https://via.placeholder.com/50x50/4F959D/FFFFFF?text=TI" alt="TechInnovate">
-                            </div>
+                            
                             <div class="application-info">
-                                <h3>Senior Software Developer</h3>
-                                <p>TechInnovate Solutions</p>
-                                <span class="application-date">Applied 3 days ago</span>
+                                <h3>{{ $application->job->job_title }}</h3>
+                                <p>{{ $application->job->location }}</p>
+                                <span class="application-date">Applied {{ $application->created_at->diffForHumans() }}</span>
                             </div>
                         </div>
-                        <div class="application-status">
-                            <span class="status-badge under-review">Under Review</span>
-                        </div>
-                        <div class="application-actions">
-                            <button class="btn-outline">View Details</button>
-                            <button class="btn-secondary">Withdraw</button>
+                        
+                    </div>
+                    @empty
+                    <div class="no-applications">
+                        <div class="empty-state">
+                            <i class="fas fa-file-alt"></i>
+                            <h3>No Applications Yet</h3>
+                            <p>You haven't applied to any jobs yet. Start browsing and apply to jobs that interest you!</p>
+                            <button class="btn-primary" onclick="showSection('job-feed')">Browse Jobs</button>
                         </div>
                     </div>
-
-                    <div class="application-item">
-                        <div class="application-header">
-                            <div class="company-logo">
-                                <img src="https://via.placeholder.com/50x50/205781/FFFFFF?text=DM" alt="Digital Marketing Pro">
-                            </div>
-                            <div class="application-info">
-                                <h3>Digital Marketing Manager</h3>
-                                <p>Digital Marketing Pro</p>
-                                <span class="application-date">Applied 1 week ago</span>
-                            </div>
-                        </div>
-                        <div class="application-status">
-                            <span class="status-badge interview">Interview Scheduled</span>
-                        </div>
-                        <div class="application-actions">
-                            <button class="btn-outline">View Details</button>
-                            <button class="btn-primary">Join Interview</button>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
-            </section>
-
-            <!-- Saved Jobs Section -->
+            </section>            <!-- Saved Jobs Section -->
             <section id="saved-jobs" class="dashboard-section">
                 <div class="section-header">
                     <h1>Saved Jobs</h1>
@@ -299,22 +277,53 @@
                 </div>
 
                 <div class="saved-jobs-grid">
+                    @forelse($saved_jobs ?? [] as $saved)
                     <div class="saved-job-card">
                         <div class="job-header">
                             <div class="company-logo">
-                                <img src="https://via.placeholder.com/50x50/98D2C0/FFFFFF?text=UI" alt="UI Design Studio">
+                                @if($saved->job->job_image)
+                                    <img src="{{ asset('storage/' . $saved->job->job_image) }}" alt="{{ $saved->job->job_title }}">
+                                @else
+                                    <div style="width: 50px; height: 50px; background: var(--calm-teal); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                                        {{ strtoupper(substr($saved->job->job_title, 0, 2)) }}
+                                    </div>
+                                @endif
                             </div>
-                            <button class="unsave-btn">
+                            <button class="unsave-btn" onclick="unsaveJob({{ $saved->id }})">
                                 <i class="fas fa-bookmark"></i>
                             </button>
                         </div>
-                        <h3>UI/UX Designer</h3>
-                        <p>Creative Design Studio</p>
-                        <span class="location">Remote</span>
+                        <h3>{{ $saved->job->job_title }}</h3>
+                        <p>{{ Str::limit($saved->job->job_description, 100) }}</p>
+                        <span class="location">
+                            <i class="fas fa-map-marker-alt"></i> {{ $saved->job->location }}
+                        </span>
+                        <div class="salary-info">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>{{ $saved->job->salary_range }}</span>
+                        </div>
                         <div class="action-buttons">
-                            <button class="btn-primary">Apply Now</button>
+                            <form action="{{route('job.action')}}" method="post" style="display: inline;">
+                                @csrf
+                                <input type="hidden" name="profile_id" value="{{ $data->id }}">
+                                <input type="hidden" name="job_id" value="{{ $saved->job->id }}">
+                                <button class="btn-primary" type="submit">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Apply Now
+                                </button>
+                            </form>
                         </div>
                     </div>
+                    @empty
+                    <div class="no-saved-jobs">
+                        <div class="empty-state">
+                            <i class="fas fa-bookmark"></i>
+                            <h3>No Saved Jobs</h3>
+                            <p>You haven't saved any jobs yet. Browse jobs and save the ones you're interested in!</p>
+                            <button class="btn-primary" onclick="showSection('job-feed')">Browse Jobs</button>
+                        </div>
+                    </div>
+                    @endforelse
                 </div>
             </section>
         </main>
@@ -410,19 +419,41 @@
                 this.innerHTML = '<i class="fas fa-sync-alt"></i> Load More Jobs';
                 // Add new job posts here
             }, 2000);
+        });        // Apply button functionality - Remove this section as it interferes with form submission
+        // The forms should handle their own submission without JavaScript interference
+          // Add loading state for apply buttons
+        document.querySelectorAll('form[action*="job.action"]').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Applying...';
+                    submitBtn.disabled = true;
+                }
+            });
         });
 
-        // Apply button functionality
-        document.querySelectorAll('.btn-primary').forEach(btn => {
-            if (btn.textContent.includes('Apply Now')) {
-                btn.addEventListener('click', function() {
-                    // Add apply logic here
-                    this.innerHTML = '<i class="fas fa-check"></i> Applied';
-                    this.disabled = true;
-                    this.style.backgroundColor = '#2ed573';
-                });
+        // Function to show job details in a modal or expand view
+        function showJobDetails(jobId) {
+            // For now, show an alert with job ID
+            // Later this can be implemented with a modal or detailed view
+            alert('View job details for Job ID: ' + jobId + '\n\nThis functionality will show detailed job information in a modal.');
+        }        // Function to withdraw application
+        function withdrawApplication(applicationId) {
+            if (confirm('Are you sure you want to withdraw this application? This action cannot be undone.')) {
+                // For now, show an alert
+                // Later this should make an AJAX request to withdraw the application
+                alert('Withdraw functionality for Application ID: ' + applicationId + '\n\nThis will be implemented to make an AJAX request to withdraw the application.');
             }
-        });
+        }
+
+        // Function to unsave a job
+        function unsaveJob(savedJobId) {
+            if (confirm('Are you sure you want to remove this job from your saved jobs?')) {
+                // For now, show an alert
+                // Later this should make an AJAX request to unsave the job
+                alert('Unsave functionality for Saved Job ID: ' + savedJobId + '\n\nThis will be implemented to make an AJAX request to remove the job from saved jobs.');
+            }
+        }
     </script>
 </body>
 </html>

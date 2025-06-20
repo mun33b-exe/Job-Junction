@@ -39,6 +39,11 @@ Route::get('/actions/employee', [ProfileController::class, 'job_action'])->name(
 
 
 
+Route::post('/jobs/saved', [ProfileController::class, 'saved'])->name('job.saved');
+Route::get('/jobs/saved', [ProfileController::class, 'saved'])->name('job.saved');
+
+
+
 
 //temporary dashboard routes
 // Route::post('/signup/view', function () {
